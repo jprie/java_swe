@@ -1,0 +1,1 @@
+ALTER TABLE Photo ADD CONSTRAINT Photo_By_Photographer FOREIGN KEY (photographer_id) REFERENCES PHOTOGRAPHER (id);
