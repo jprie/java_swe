@@ -1,4 +1,4 @@
-package at.wifiwien.javaswe.arche.application;
+package ${package}.application;
 
 public class Constants {
 
