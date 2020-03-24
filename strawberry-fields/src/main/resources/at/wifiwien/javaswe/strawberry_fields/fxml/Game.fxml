@@ -2,6 +2,7 @@
 
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
 
 <AnchorPane fx:id="view" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="at.wifiwien.javaswe.strawberry_fields.controller.GameController">
    <children>
@@ -10,8 +11,14 @@
             <fx:include source="Board.fxml" BorderPane.alignment="CENTER" />
          </center>
          <top>
-            <fx:include source="GameInfo.fxml" />
+            <VBox BorderPane.alignment="CENTER">
+               <children>
+                  <fx:include source="Menu.fxml" />
+                  <fx:include source="GameInfo.fxml" />
+               </children>
+            </VBox>
          </top>
+         
       </BorderPane>
    </children>
 </AnchorPane>

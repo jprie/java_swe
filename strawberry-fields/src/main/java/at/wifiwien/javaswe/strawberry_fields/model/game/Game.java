@@ -54,8 +54,6 @@ public class Game {
 	private BooleanProperty gameInitialized = new SimpleBooleanProperty(false);
 	private BooleanProperty gameEnded = new SimpleBooleanProperty(false);
 
-	private int cnt;
-
 	public static Game getInstance() {
 
 		if (game == null) {
