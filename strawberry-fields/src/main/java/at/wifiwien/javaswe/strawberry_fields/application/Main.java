@@ -22,7 +22,7 @@ public class Main extends Application {
 			
 			FXMLLoader loader = new FXMLLoader();
 			loader.setResources(ResourceBundle.getBundle(Constants.PATH_TO_APPLICATION_BUNDLE, Locale.GERMANY));
-			loader.setLocation(getClass().getResource(Constants.PATH_TO_GAME_FXML));
+			loader.setLocation(getClass().getResource(Constants.PATH_TO_START_FXML));
 			Parent root = loader.load();
 			Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource(Constants.PATH_TO_APPLICATION_CSS).toExternalForm());

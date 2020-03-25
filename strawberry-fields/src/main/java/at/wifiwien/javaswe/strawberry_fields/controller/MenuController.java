@@ -8,6 +8,8 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuItem;
+import javafx.stage.Stage;
+import javafx.scene.Node;
 import javafx.scene.control.Menu;
 
 public class MenuController {
@@ -50,7 +52,9 @@ public class MenuController {
     
     @FXML
     void handleExit(ActionEvent event) {
-    	Platform.exit();
+    	
+    	Stage currentStage = (Stage)((Node)event.getTarget()).getScene().getWindow();
+    	currentStage.close();
     }
 
     @FXML

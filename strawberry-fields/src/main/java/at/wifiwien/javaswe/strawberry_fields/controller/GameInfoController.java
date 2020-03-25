@@ -48,7 +48,7 @@ public class GameInfoController {
 		// internationalize i18n
 		player1Label.setText(resources.getString("player") + 1 + ":");
 		player2Label.setText(resources.getString("player") + 2 + ":");
-		strawberriesLeftLabel.setText(resources.getString("strawberriesLeft"));
+		strawberriesLeftLabel.setText(resources.getString("strawberriesLeft")+ ":");
 		
 		// converter
 		StringConverter<Number> converter = new NumberStringConverter();
@@ -69,14 +69,15 @@ public class GameInfoController {
 					if (game.getWinner().isPresent()) {
 						// Winner
 						String winnerName = game.getWinner().map((w) -> w.getName()).orElse("Error: no winner");
-						dialogInfo = winnerName + " WINS! Congratulations";
+						dialogInfo = winnerName + " " + resources.getString("winsMessage");
 						
 					} else {
 						// Draw
-						dialogInfo = "This is a DRAW";
+						dialogInfo = resources.getString("drawMessage");
 					}
 					
-					GameEndedDialog dialog = new GameEndedDialog(dialogInfo);
+					String dialogHeader = resources.getString("gameEnded");
+					GameEndedDialog dialog = new GameEndedDialog(dialogHeader, dialogInfo);
 					Optional<ButtonType> result = dialog.showAndWait();
 					if (result.isPresent()) {
 						if (result.get() == ButtonType.OK) {

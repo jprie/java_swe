@@ -5,6 +5,8 @@ public class Constants {
 	// path to fxml files
 	public static final String PATH_TO_GAME_FXML = "/at/wifiwien/javaswe/strawberry_fields/fxml/Game.fxml";
 	public static final String PATH_TO_BOARD_FXML = "/at/wifiwien/javaswe/strawberry_fields/fxml/Board.fxml";
+	public static final String PATH_TO_START_FXML = "/at/wifiwien/javaswe/strawberry_fields/fxml/Start.fxml";
+	public static final String PATH_TO_SETTINGS_FXML = "/at/wifiwien/javaswe/strawberry_fields/fxml/Settings.fxml";
 	
 	// path to css files
 	public static final String PATH_TO_APPLICATION_CSS = "/at/wifiwien/javaswe/strawberry_fields/css/application.css";
@@ -48,6 +50,8 @@ public class Constants {
 	public static final String PATH_TO_PLAYER_MALE_IMAGE = "/at/wifiwien/javaswe/strawberry_fields/images/player_male_128px.png";
 	public static final String PATH_TO_PLAYER_FEMALE_IMAGE = "/at/wifiwien/javaswe/strawberry_fields/images/player_female_128px.png";
 	public static final String PATH_TO_APPLICATION_BUNDLE = "at.wifiwien.javaswe.strawberry_fields.messages.messages";
+	
+	
 	
 	
 

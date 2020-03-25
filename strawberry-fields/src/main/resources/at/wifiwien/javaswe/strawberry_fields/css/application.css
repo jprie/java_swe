@@ -3,13 +3,13 @@
 .stack-pane {
 
 
-	-fx-background-image: url("/at/wifiwien/javaswe/strawberry_fields/images/square_gray_light_png_128px.png");
+	-fx-background-image: url("/at/wifiwien/javaswe/strawberry_fields/images/grass_128px.png");
 	
 }
 
 
 .tile-pane {
-	-fx-background-color: #13FE14;
+	-fx-background-color: brown;
 }
 
 .button {

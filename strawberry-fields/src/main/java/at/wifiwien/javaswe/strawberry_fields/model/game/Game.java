@@ -57,7 +57,7 @@ public class Game {
 	public static Game getInstance() {
 
 		if (game == null) {
-			game = new Game(15, 10, 1);
+			game = new Game(15, 10, 20);
 			game.init();
 		}
 		return game;
@@ -210,7 +210,7 @@ public class Game {
 		// check positions inside board
 		if (!board.positionInsideBoard(dest)) {
 
-			throw new MoveException("dest outside of board");
+			throw new MoveException("Destination outside of board");
 		}
 
 		Optional<Item> srcItem = board.getItemAtPosition(src);

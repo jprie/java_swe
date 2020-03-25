@@ -189,7 +189,7 @@ public class BoardController extends BaseController {
 
 			// resize to fit tilePane
 			tilePane.getScene().getWindow().setWidth(numColumns * 80 + 20 + 10);
-			tilePane.getScene().getWindow().setHeight(numRows * 80 + 40 + 60 + 10);
+			tilePane.getScene().getWindow().setHeight(numRows * 80 + 40 + 60 + 20 + 10);
 
 			OutputHandler.printDebug(game.getBoard().getFields().toString());
 		});

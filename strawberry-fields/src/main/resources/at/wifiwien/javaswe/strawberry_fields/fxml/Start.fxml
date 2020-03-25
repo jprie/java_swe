@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.text.Font?>
+
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="at.wifiwien.javaswe.strawberry_fields.controller.StartController">
+   <children>
+      <VBox alignment="TOP_CENTER" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label text="Strawberry Fields 1.0">
+               <textFill>
+                  <LinearGradient endX="1.0" endY="1.0">
+                     <stops>
+                        <Stop color="#c23b2b" />
+                        <Stop color="#c23a2b" offset="0.57069331761227" />
+                        <Stop color="#e8c05c" offset="1.0" />
+                     </stops>
+                  </LinearGradient>
+               </textFill>
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Button fx:id="newGameButton" mnemonicParsing="false" onAction="#handleNewGame" text="New Game" />
+            <Button fx:id="settingsButton" mnemonicParsing="false" onAction="#handleSettings" text="Settings" />
+            <Button fx:id="quitButton" mnemonicParsing="false" onAction="#handleQuit" text="Quit" />
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+      </VBox>
+   </children>
+</AnchorPane>

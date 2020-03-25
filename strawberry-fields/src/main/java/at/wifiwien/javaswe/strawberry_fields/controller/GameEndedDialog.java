@@ -5,9 +5,9 @@ import javafx.scene.control.Dialog;
 
 public class GameEndedDialog extends Dialog<ButtonType> {
 
-	public GameEndedDialog(String content) {
+	public GameEndedDialog(String header, String content) {
 		this.setContentText(content);
-		this.setHeaderText("Game ended");
+		this.setHeaderText(header);
 		this.getDialogPane().getButtonTypes().add(ButtonType.OK);
 		this.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
 	}
