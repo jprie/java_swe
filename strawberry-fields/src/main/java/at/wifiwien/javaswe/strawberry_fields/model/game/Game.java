@@ -1,6 +1,7 @@
 package at.wifiwien.javaswe.strawberry_fields.model.game;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -13,6 +14,7 @@ import at.wifiwien.javaswe.strawberry_fields.exception.SyntaxErrorException;
 import at.wifiwien.javaswe.strawberry_fields.exception.UnknownCommandException;
 import at.wifiwien.javaswe.strawberry_fields.model.io.InputHandler;
 import at.wifiwien.javaswe.strawberry_fields.model.io.OutputHandler;
+import at.wifiwien.javaswe.strawberry_fields.model.item.Fence;
 import at.wifiwien.javaswe.strawberry_fields.model.item.Item;
 import at.wifiwien.javaswe.strawberry_fields.model.item.Piece;
 import at.wifiwien.javaswe.strawberry_fields.model.item.Strawberry;
@@ -45,7 +47,8 @@ public class Game {
 
 	private boolean gameIsStopped = false;
 
-	private Position[] currentPosition;
+	private Position[] currentPositions;
+	private Position[] startingPositions;
 
 	private IntegerProperty playersTurn = new SimpleIntegerProperty();
 
@@ -54,25 +57,51 @@ public class Game {
 	private BooleanProperty gameInitialized = new SimpleBooleanProperty(false);
 	private BooleanProperty gameEnded = new SimpleBooleanProperty(false);
 
+	private ArrayList<Position> fencePositions;
+	
+	// defines the default configuration
+	private static int[] configuration = {15, 10, 20};
+	
+	public static final int INDEX_WIDTH = 0;
+	public static final int INDEX_HEIGHT = 1;
+	public static final int INDEX_NUMBER_STRAWBERRIES = 2;
+	
+
 	public static Game getInstance() {
 
 		if (game == null) {
-			game = new Game(15, 10, 20);
+			game = new Game(configuration);
 			game.init();
 		}
 		return game;
 	}
+	
+	
+	// get the configuration from outside
+	public static int[] getConfiguration() {
+		return configuration;
+	}
 
-	private Game(int width, int height, long numberStrawberries) {
 
-		// starting positions diametral
-		STARTING_POSITION_P1 = new Position(0, 0);
-		STARTING_POSITION_P2 = new Position(width - 1, height - 1);
+	// set the configuration for defining a different board
+	public static void setConfiguration(int[] configuration) {
+		Game.configuration = configuration;
+	}
+
+
+
+	private Game(int[] configuration) {
+
 
 		// set all fields
-		this.numberStrawberries = numberStrawberries;
-		this.boardWidth = width;
-		this.boardHeight = height;
+		this.numberStrawberries = configuration[INDEX_NUMBER_STRAWBERRIES];
+		this.boardWidth = configuration[INDEX_WIDTH];
+		this.boardHeight = configuration[INDEX_HEIGHT];
+		
+		// starting positions diametral
+		STARTING_POSITION_P1 = new Position(0, 0);
+		STARTING_POSITION_P2 = new Position(boardWidth - 1, boardHeight - 1);
+
 	}
 
 	void init() {
@@ -95,9 +124,15 @@ public class Game {
 		players[0].setPiece(new Piece(Constants.PLAYER_1_FACE));
 		players[1].setPiece(new Piece(Constants.PLAYER_2_FACE));
 
-		// create strawberries
+		// create strawberries and store them in a list to keep track of their number
 		strawberries = FXCollections.observableArrayList(
 				Stream.generate(Strawberry::new).limit(numberStrawberries).collect(Collectors.toList()));
+
+		// create horizontal fence in the center, and two smaller ones
+		fencePositions = new ArrayList<Position>(
+				List.of(new Position(2, 3), new Position(3, 3),
+						new Position(5, 4), new Position(6, 4), new Position(7, 4), new Position(8, 4),
+						new Position(10, 5), new Position(11, 5)));
 
 		// create empty board of given size
 		board = new Board(boardWidth, boardHeight);
@@ -113,19 +148,26 @@ public class Game {
 		board.setItemAtPosition(players[0].getPiece(), STARTING_POSITION_P1);
 		board.setItemAtPosition(players[1].getPiece(), STARTING_POSITION_P2);
 
-		currentPosition = new Position[] { STARTING_POSITION_P1, STARTING_POSITION_P2 };
+		startingPositions = new Position[] { STARTING_POSITION_P1, STARTING_POSITION_P2 };
+		currentPositions = new Position[] { STARTING_POSITION_P1, STARTING_POSITION_P2 };
+		
 
 		// create random position streams
 		Random rand = new Random(Instant.now().getEpochSecond());
 		List<Position> randomPositions = Stream
 				.generate(() -> new Position(rand.nextInt(boardWidth), rand.nextInt(boardHeight)))
 				.filter(p -> !(p.equals(STARTING_POSITION_P1) || p.equals(STARTING_POSITION_P2))).distinct()
-				.limit(numberStrawberries).collect(Collectors.toList());
+				.filter(p -> !(fencePositions.contains(p))).limit(numberStrawberries).collect(Collectors.toList());
 
 		assert (randomPositions.size() == numberStrawberries);
 		assert (randomPositions.size() == strawberries.size());
 
-		// put strawberries at generated random positions
+		// layout fence at given positions
+		for (Position p : fencePositions) {
+			board.setItemAtPosition(new Fence(), p);
+		}
+
+		// layout strawberries at generated random positions
 		for (int i = 0; i < strawberries.size(); i++) {
 			board.setItemAtPosition(strawberries.get(i), randomPositions.get(i));
 		}
@@ -201,7 +243,7 @@ public class Game {
 
 		// src position is given by the movable piece's location (stored after every
 		// move)
-		Position src = currentPosition[playersTurn.get()];
+		Position src = currentPositions[playersTurn.get()];
 
 		// dest position is calculated from src position and given move (direction,
 		// distance)
@@ -221,10 +263,30 @@ public class Game {
 			throw new MoveException("No piece at src position");
 		}
 
+		if (destItem.isPresent() && destItem.get() instanceof Fence) {
+
+			throw new MoveException("Obstacle on path");
+		}
+
+		// execute move
 		Optional<Item> optItem = board.removeItemFromPosition(src);
 
+		// playersTurn + 1 % 2 given the other player
+		int opponent = (playersTurn.get() + 1) % 2;
+		
+		
 		if (optItem.isPresent())
 			board.setItemAtPosition(optItem.get(), dest);
+		
+		
+		// if two pieces meet the one how stayed is caught and return to the starting position
+		if (destItem.isPresent() && destItem.get() == players[opponent].getPiece()) {
+			
+			Piece piece = players[opponent].getPiece();
+			board.setItemAtPosition(piece, startingPositions[opponent]);
+			currentPositions[opponent] = startingPositions[opponent];
+			
+		}
 
 		// update score
 		if (destItem.isPresent() && destItem.get() instanceof Strawberry) {
@@ -243,11 +305,11 @@ public class Game {
 			// game ended
 			winner = determineWinner();
 			gameEnded.set(true);
-			
+
 		}
 
 		// update the current position
-		currentPosition[playersTurn.get()] = dest;
+		currentPositions[playersTurn.get()] = dest;
 
 		togglePlayersTurn();
 

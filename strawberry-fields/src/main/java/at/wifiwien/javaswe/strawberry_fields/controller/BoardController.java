@@ -14,7 +14,6 @@ import at.wifiwien.javaswe.strawberry_fields.model.game.Game;
 import at.wifiwien.javaswe.strawberry_fields.model.game.Move;
 import at.wifiwien.javaswe.strawberry_fields.model.io.OutputHandler;
 import at.wifiwien.javaswe.strawberry_fields.model.item.Item;
-import at.wifiwien.javaswe.strawberry_fields.model.item.Strawberry;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -40,11 +39,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 
-public class BoardController extends BaseController {
+public class BoardController extends CommonPropertyController {
 
 	Game game = Game.getInstance();
 
-	int numStrawberries = 0;
 	@FXML
 	private ResourceBundle resources;
 
@@ -53,8 +51,6 @@ public class BoardController extends BaseController {
 
 	@FXML
 	private TilePane tilePane;
-
-	private int cnt;
 
 	@FXML
 	void initialize() {
@@ -71,10 +67,9 @@ public class BoardController extends BaseController {
 		Bindings.bindContentBidirectional(fields, game.getBoard().getFields());
 
 		if (game.isGameInitialized() == true) {
-			// initBoard();
-			// bidirectional binding to model information
+			initBoard();
+			
 
-			generateFields();
 		} else {
 			// register listener and init board later
 			game.gameInitializedProperty().addListener((obs, ov, nv) -> initBoard());
@@ -82,12 +77,12 @@ public class BoardController extends BaseController {
 		}
 	}
 
+	// handles when local fields get updated triggered by a change in the model fields 
 	public void handleFieldsUpdated(Change<? extends Field> c) {
 
 		while (c.next()) {
 			if (c.wasUpdated()) {
 
-				System.out.println("updated: " + c.getFrom() + "-" + c.getTo());
 				// only one field is updated at a time
 				updateAtBoard(c.getFrom());
 			}
@@ -116,8 +111,7 @@ public class BoardController extends BaseController {
 	}
 
 	/**
-	 * Idea: only one row can be changed at a time, update row that was altered
-	 * depending on index
+	 * Update takes an imageView (if available) from the board and replaces it with a piece
 	 */
 	private void updateAtBoard(int index) {
 
@@ -141,11 +135,14 @@ public class BoardController extends BaseController {
 
 	}
 
+	/**
+	 * Generates individual fields of the surface in a 2d-tilePane
+	 * Fields can contain an imageView with an Image representing an item
+	 */
 	private void generateFields() {
 
 		int numColumns = game.getBoard().getWidth();
 		int numRows = game.getBoard().getHeight();
-//		OutputHandler.printDebug("before loop: " + numColumns + ":" + numRows);
 
 		// init board
 
@@ -154,17 +151,21 @@ public class BoardController extends BaseController {
 		for (int i = 0; i < numRows; i++) {
 			for (int j = 0; j < numColumns; j++) {
 
+				// calculate 2d-coordinates to 1-d list-index
 				Optional<Item> item = fields.get(i * numColumns + j).getItem();
 
+				// create a stack pane for each field in the model
 				StackPane stackPane = new StackPane();
 				stackPane.getStyleClass().add("stack-pane");
+				
 				if (item.isPresent()) {
-					System.out.println(item.get().toString());
+				
+					// if item exists represent it with an image and add it to the stack
 					ImageView imageView = imageViewForItem(item.get());
-
 					stackPane.getChildren().add(imageView);
+					
+					// count items for checking later
 					numItems++;
-
 				}
 
 				stacks.add(stackPane);
@@ -173,62 +174,78 @@ public class BoardController extends BaseController {
 		}
 
 		// check that all items were drawn
-		assert (numItems - 2 == game.getStrawberriesLeft());
+		assert (numItems - 2 - 8 == game.getStrawberriesLeft());
 
+		
 		addStacksToTilePane(numColumns, numRows, stacks);
 	}
 
+	/**
+	 * Configures the tiles of the tile pane and adds the stacks to it as children
+	 * This has to be done, since the tilePane is already added to the scene. Thus, we must
+	 * add the children on the ApplicationThread! 
+	 * @param numColumns
+	 * @param numRows
+	 * @param stacks
+	 */
 	private void addStacksToTilePane(int numColumns, int numRows, List<StackPane> stacks) {
 		Platform.runLater(() -> {
 			tilePane.setPrefColumns(numColumns);
 			tilePane.getChildren().addAll(stacks);
-			tilePane.setPrefTileWidth(80);
-			tilePane.setPrefTileHeight(80);
+			
 			// set focus for getting key events
 			tilePane.requestFocus();
 
-			// resize to fit tilePane
-			tilePane.getScene().getWindow().setWidth(numColumns * 80 + 20 + 10);
-			tilePane.getScene().getWindow().setHeight(numRows * 80 + 40 + 60 + 20 + 10);
+			// tell game controller that tile pane was initialized
+			boardInitialized.set(true);
 
-			OutputHandler.printDebug(game.getBoard().getFields().toString());
 		});
 	}
 
+	/**
+	 * Creates an image view with an image that represents the given item
+	 * @param item
+	 * @return
+	 */
 	private ImageView imageViewForItem(Item item) {
-
-		if (item instanceof Strawberry) {
-			System.out.println(++numStrawberries);
-		}
-
-		ImageView imageView = new ImageView(new Image(getClass().getResourceAsStream(getImageURLForItem(item))));
-		imageView.setPreserveRatio(true);
-		imageView.setFitHeight(60);
-		return imageView;
+		
+		ImageView itemView = new ImageView(new Image(getClass().getResourceAsStream(getImageURLForItem(item))));
+		itemView.setPreserveRatio(true);
+		itemView.setFitHeight(Constants.ITEMVIEW_HEIGHT_IN_STACKVIEW);
+		return itemView;
 	}
 
+	/**
+	 * Returns the URL where the image file can be found
+	 * @param item
+	 * @return
+	 */
 	private String getImageURLForItem(Item item) {
 		String url;
 
 		switch (item.getType()) {
 		case PIECE:
-
 			url = item == game.getPlayer1().getPiece() ? Constants.PATH_TO_PLAYER_MALE_IMAGE
 					: Constants.PATH_TO_PLAYER_FEMALE_IMAGE;
 			break;
 		case STRAWBERRY:
-
 			url = Constants.PATH_TO_STRAWBERRY_IMAGE;
+			break;
+		case FENCE:
+			url = Constants.PATH_TO_FENCE_IMAGE;
 			break;
 		default:
 			url = "";
 		}
 
-		System.out.println(url);
 		return url;
 
 	}
 
+	/**
+	 * Handles key events and sends moves to the model
+	 * @param event
+	 */
 	@FXML
 	private void handleKeyPressed(KeyEvent event) {
 		System.out.println("Scene");
@@ -257,6 +274,9 @@ public class BoardController extends BaseController {
 		}
 	}
 
+	/**
+	 * Sample animation showing the red border when pieces go outside of board
+	 */
 	private void animateRedBorder() {
 		// set false, so tilePane doesn't redistribute the columns while being shrunk by
 		// the border

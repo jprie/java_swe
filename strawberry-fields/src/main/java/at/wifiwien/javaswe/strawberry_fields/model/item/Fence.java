@@ -2,12 +2,13 @@ package at.wifiwien.javaswe.strawberry_fields.model.item;
 
 import at.wifiwien.javaswe.strawberry_fields.application.Constants;
 
-public class Fence {
+public class Fence extends Item {
 
-	boolean isHorizontal;
+	boolean isHorizontal = true;
 
 	public Fence() {
-		// TODO Auto-generated constructor stub
+		
+		super(Constants.FENCE_HORIZONTAL_FACE, Item.Type.FENCE);
 	}
 
 	@Override

@@ -7,10 +7,12 @@
 	
 }
 
-
 .tile-pane {
 	-fx-background-color: brown;
+	-fx-pref-tile-height: 80px;
+	-fx-pref-tile-width: 80px;
 }
+
 
 .button {
 	-fx-background-color: #13FE14;

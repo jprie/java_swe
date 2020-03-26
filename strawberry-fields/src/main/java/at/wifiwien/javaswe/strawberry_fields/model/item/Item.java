@@ -4,7 +4,7 @@ package at.wifiwien.javaswe.strawberry_fields.model.item;
 public class Item {
 	
 	public enum Type {
-		PIECE, STRAWBERRY
+		PIECE, STRAWBERRY, FENCE
 	}
 
 	// set only at the beginning of the game

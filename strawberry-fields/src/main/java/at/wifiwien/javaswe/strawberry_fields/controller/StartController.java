@@ -57,6 +57,7 @@ public class StartController {
 		
 		// open game in another window
 		Stage stage = new Stage();
+		stage.setResizable(false);
 		stage.setScene(scene);
 		stage.initModality(Modality.WINDOW_MODAL);
 		stage.showAndWait();

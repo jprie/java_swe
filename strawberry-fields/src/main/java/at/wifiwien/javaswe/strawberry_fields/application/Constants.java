@@ -49,7 +49,12 @@ public class Constants {
 	public static final String PATH_TO_STRAWBERRY_IMAGE = "/at/wifiwien/javaswe/strawberry_fields/images/strawberry-transparent_128px.png";
 	public static final String PATH_TO_PLAYER_MALE_IMAGE = "/at/wifiwien/javaswe/strawberry_fields/images/player_male_128px.png";
 	public static final String PATH_TO_PLAYER_FEMALE_IMAGE = "/at/wifiwien/javaswe/strawberry_fields/images/player_female_128px.png";
+	public static final String PATH_TO_FENCE_IMAGE = "/at/wifiwien/javaswe/strawberry_fields/images/fence_128px.png";
+	
+	
 	public static final String PATH_TO_APPLICATION_BUNDLE = "at.wifiwien.javaswe.strawberry_fields.messages.messages";
+	
+	public static final double ITEMVIEW_HEIGHT_IN_STACKVIEW = 60;
 	
 	
 	

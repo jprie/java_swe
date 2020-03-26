@@ -13,7 +13,6 @@
          <top>
             <VBox BorderPane.alignment="CENTER">
                <children>
-                  <fx:include source="Menu.fxml" />
                   <fx:include source="GameInfo.fxml" />
                </children>
             </VBox>

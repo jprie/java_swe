@@ -6,10 +6,8 @@ import java.util.ResourceBundle;
 
 import at.wifiwien.javaswe.strawberry_fields.model.game.Game;
 import at.wifiwien.javaswe.strawberry_fields.controller.GameEndedDialog;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.util.StringConverter;
@@ -53,47 +51,48 @@ public class GameInfoController {
 		// converter
 		StringConverter<Number> converter = new NumberStringConverter();
 
-		// set points to 0
+		// bind scores of players and remaining fruits to outputLabels
 		strawberriesPlayer1Label.textProperty().bindBidirectional(game.getPlayer1().scoreProperty(), converter);
 		strawberriesPlayer2Label.textProperty().bindBidirectional(game.getPlayer2().scoreProperty(), converter);
 		numberStrawberriesLeftLabel.textProperty().bindBidirectional(game.strawberriesLeftProperty(), converter);
 
-		game.gameEndedProperty().addListener(new ChangeListener<Boolean>() {
+		// listen to changes in game ended property
+		game.gameEndedProperty().addListener(this::handleGameEndedChanged);
 
-			@Override
-			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
-				
-				if (newValue == true) {
-					
-					String dialogInfo = "";
-					if (game.getWinner().isPresent()) {
-						// Winner
-						String winnerName = game.getWinner().map((w) -> w.getName()).orElse("Error: no winner");
-						dialogInfo = winnerName + " " + resources.getString("winsMessage");
-						
-					} else {
-						// Draw
-						dialogInfo = resources.getString("drawMessage");
-					}
-					
-					String dialogHeader = resources.getString("gameEnded");
-					GameEndedDialog dialog = new GameEndedDialog(dialogHeader, dialogInfo);
-					Optional<ButtonType> result = dialog.showAndWait();
-					if (result.isPresent()) {
-						if (result.get() == ButtonType.OK) {
-							System.out.println("Dialog ok");
-						} else {
-							System.out.println("Dialog cancel");
-						}
-					}
 
-					
-				}
+	}
+	
+	public void handleGameEndedChanged(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+		
+		// show GameEndedDialog only if game ended
+		if (newValue == true) {
+			
+			String dialogInfo = "";
+			if (game.getWinner().isPresent()) {
+				// Winner
+				String winnerName = game.getWinner().map((w) -> w.getName()).orElse("Error: no winner");
+				dialogInfo = winnerName + " " + resources.getString("winsMessage");
 				
+			} else {
+				// Draw
+				dialogInfo = resources.getString("drawMessage");
 			}
 			
-		});
+			String dialogHeader = resources.getString("gameEnded");
+			GameEndedDialog dialog = new GameEndedDialog(dialogHeader, dialogInfo);
+			
+			// show dialog and wait for answer (could be used to start a new game)
+			Optional<ButtonType> result = dialog.showAndWait();
+			if (result.isPresent()) {
+				if (result.get() == ButtonType.OK) {
+					System.out.println("Dialog ok");
+				} else {
+					System.out.println("Dialog cancel");
+				}
+			}
 
-
+			
+		}
+		
 	}
 }
